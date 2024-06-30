@@ -93,6 +93,7 @@ target_sources(
     ${TARGET_NAME} PRIVATE
     "Core\\Src\\main.c"
     "Core\\Src\\mmc_ops.c"
+    "Core\\Src\\ringbuffer.c"
     "Core\\Src\\stm32l4xx_hal_msp.c"
     "Core\\Src\\stm32l4xx_hal_timebase_tim.c"
     "Core\\Src\\stm32l4xx_it.c"

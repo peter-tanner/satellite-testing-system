@@ -223,7 +223,6 @@ void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 {
   /* USER CODE BEGIN 3 */
-
   /* USER CODE END 3 */
   USBD_LL_Resume((USBD_HandleTypeDef *)hpcd->pData);
 }
