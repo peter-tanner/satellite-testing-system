@@ -73,6 +73,8 @@ void HAL_MspInit(void)
   __HAL_RCC_PWR_CLK_ENABLE();
 
   /* System interrupt init*/
+  /* PendSV_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
   /** PVD Configuration
   */
@@ -607,7 +609,7 @@ void HAL_MMC_MspInit(MMC_HandleTypeDef* hmmc)
     /* SDMMC1 Init */
     hdma_sdmmc1.Instance = DMA2_Channel4;
     hdma_sdmmc1.Init.Request = DMA_REQUEST_7;
-    hdma_sdmmc1.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_sdmmc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_sdmmc1.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_sdmmc1.Init.MemInc = DMA_MINC_ENABLE;
     hdma_sdmmc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
@@ -627,7 +629,7 @@ void HAL_MMC_MspInit(MMC_HandleTypeDef* hmmc)
     __HAL_LINKDMA(hmmc,hdmatx,hdma_sdmmc1);
 
     /* SDMMC1 interrupt Init */
-    HAL_NVIC_SetPriority(SDMMC1_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(SDMMC1_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
   /* USER CODE BEGIN SDMMC1_MspInit 1 */
 
@@ -831,7 +833,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* hpcd)
       HAL_PWREx_EnableVddUSB();
     }
     /* USB_OTG_FS interrupt Init */
-    HAL_NVIC_SetPriority(OTG_FS_IRQn, 2, 0);
+    HAL_NVIC_SetPriority(OTG_FS_IRQn, 7, 0);
     HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
   /* USER CODE BEGIN USB_OTG_FS_MspInit 1 */
 

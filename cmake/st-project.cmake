@@ -30,6 +30,9 @@ target_include_directories(
     "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Class\\MSC\\Inc>"
     "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Core\\Inc>"
     "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Target>"
+    "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\include>"
+    "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\CMSIS_RTOS>"
+    "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\portable\\GCC\\ARM_CM4F>"
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Core\\Inc>"
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Drivers\\STM32L4xx_HAL_Driver\\Inc>"
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Drivers\\STM32L4xx_HAL_Driver\\Inc\\Legacy>"
@@ -44,6 +47,9 @@ target_include_directories(
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Class\\MSC\\Inc>"
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Core\\Inc>"
     "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/USB_COMPOSITE\\Target>"
+    "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\include>"
+    "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\CMSIS_RTOS>"
+    "$<$<AND:$<NOT:$<CONFIG:Debug>>,$<COMPILE_LANGUAGE:C>>:${PROJECT_SOURCE_DIR}/Middlewares\\Third_Party\\FreeRTOS\\Source\\portable\\GCC\\ARM_CM4F>"
 )
 
 target_compile_options(
@@ -91,8 +97,10 @@ target_link_options(
 
 target_sources(
     ${TARGET_NAME} PRIVATE
+    "Core\\Src\\entrypoint.c"
+    "Core\\Src\\freertos.c"
+    "Core\\Src\\logging.c"
     "Core\\Src\\main.c"
-    "Core\\Src\\mmc_ops.c"
     "Core\\Src\\ringbuffer.c"
     "Core\\Src\\stm32l4xx_hal_msp.c"
     "Core\\Src\\stm32l4xx_hal_timebase_tim.c"
@@ -123,6 +131,16 @@ target_sources(
     "Middlewares\\Third_Party\\FatFs\\src\\ff.c"
     "Middlewares\\Third_Party\\FatFs\\src\\option\\ccsbcs.c"
     "Middlewares\\Third_Party\\FatFs\\src\\option\\syscall.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\CMSIS_RTOS\\cmsis_os.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\croutine.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\event_groups.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\list.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\portable\\GCC\\ARM_CM4F\\port.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\portable\\MemMang\\heap_4.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\queue.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\stream_buffer.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\tasks.c"
+    "Middlewares\\Third_Party\\FreeRTOS\\Source\\timers.c"
     "Drivers\\STM32L4xx_HAL_Driver\\Src\\stm32l4xx_hal_can.c"
     "Drivers\\STM32L4xx_HAL_Driver\\Src\\stm32l4xx_hal_cortex.c"
     "Drivers\\STM32L4xx_HAL_Driver\\Src\\stm32l4xx_hal_crc_ex.c"

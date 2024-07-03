@@ -47,7 +47,8 @@ extern "C" {
 
 /* MSC Class Config */
 #ifndef MSC_MEDIA_PACKET
-#define MSC_MEDIA_PACKET             512U
+// TODO: Consider making this larger. Not sure why but anything larger is not working with the RTOS.
+#define MSC_MEDIA_PACKET             512U 
 #endif /* MSC_MEDIA_PACKET */
 
 #define MSC_MAX_FS_PACKET            0x40U

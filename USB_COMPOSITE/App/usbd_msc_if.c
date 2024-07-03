@@ -23,7 +23,8 @@
 #include "usbd_msc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "ff_gen_drv.h"
+#include "user_diskio.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +33,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+extern Diskio_drvTypeDef USER_Driver;
+extern volatile uint8_t disk_initialized;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -177,7 +180,7 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops =
 int8_t STORAGE_Init(uint8_t lun)
 {
   /* USER CODE BEGIN 2 */
-  // ALREADY INITIALIZED IN `MX_SDMMC1_MMC_Init` FUNCTION.
+  // ALREADY INITIALIZED IN `MX_MMCMMC1_MMC_Init` FUNCTION.
   return USBD_OK;
   /* USER CODE END 2 */
 }
@@ -209,8 +212,7 @@ int8_t STORAGE_IsReady(uint8_t lun)
 {
   /* USER CODE BEGIN 4 */
   // if (HAL_MMC_GetState(&hmmc1) == HAL_MMC_STATE_BUSY || HAL_MMC_GetCardState(&hmmc1) != HAL_MMC_CARD_TRANSFER)
-  //   return USBD_FAIL;
-  return USBD_OK;
+  return disk_initialized;
   /* USER CODE END 4 */
 }
 
@@ -236,7 +238,7 @@ int8_t STORAGE_IsWriteProtected(uint8_t lun)
 int8_t STORAGE_Read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 6 */
-  return MMC_read_blocks(buf, blk_addr, blk_len) == HAL_OK ? USBD_OK : USBD_FAIL;
+  return USER_Driver.disk_read(lun, buf, blk_addr, blk_len) == RES_OK ? USBD_OK : USBD_FAIL;
   /* USER CODE END 6 */
 }
 
@@ -248,7 +250,7 @@ int8_t STORAGE_Read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_l
 int8_t STORAGE_Write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 7 */
-  return MMC_write_blocks(buf, blk_addr, blk_len) == HAL_OK ? USBD_OK : USBD_FAIL;
+  return USER_Driver.disk_write(lun, buf, blk_addr, blk_len) == RES_OK ? USBD_OK : USBD_FAIL;
   /* USER CODE END 7 */
 }
 

@@ -40,6 +40,17 @@ extern MMC_HandleTypeDef hmmc1;
 
 /* USER CODE BEGIN BeforeInitSection */
 /* can be used to modify / undefine following code or add code */
+extern DMA_HandleTypeDef hdma_sdmmc1;
+
+HAL_StatusTypeDef BSP_MMC_DMA_direction(uint32_t direction)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  hdma_sdmmc1.Init.Direction = direction;
+  HAL_DMA_Abort(&hdma_sdmmc1);
+  HAL_DMA_DeInit(&hdma_sdmmc1);
+  return HAL_DMA_Init(&hdma_sdmmc1);
+}
+
 /* USER CODE END BeforeInitSection */
 /**
  * @brief  Initializes the MMC card device.
@@ -53,17 +64,18 @@ __weak uint8_t BSP_MMC_Init(void)
   {
     return MMMC_ERROR_MMC_NOT_PRESENT;
   }
-  /* HAL MMC initialization */
-  mmc_state = HAL_MMC_Init(&hmmc1);
-  /* Configure MMC Bus width (4 bits mode selected) */
-  if (mmc_state == MMMC_OK)
-  {
-    /* Enable wide operation */
-    if (HAL_MMC_ConfigWideBusOperation(&hmmc1, SDMMC_BUS_WIDE_4B) != HAL_OK)
-    {
-      mmc_state = MMMC_ERROR;
-    }
-  }
+  // /* HAL MMC initialization */
+  // mmc_state = HAL_MMC_Init(&hmmc1);
+  mmc_state = MMMC_OK;
+  // /* Configure MMC Bus width (4 bits mode selected) */
+  // if (mmc_state == MMMC_OK)
+  // {
+  //   /* Enable wide operation */
+  //   if (HAL_MMC_ConfigWideBusOperation(&hmmc1, SDMMC_BUS_WIDE_4B) != HAL_OK)
+  //   {
+  //     mmc_state = MMMC_ERROR;
+  //   }
+  // }
 
   return mmc_state;
 }
@@ -98,7 +110,14 @@ __weak uint8_t BSP_MMC_ITConfig(void)
  */
 __weak uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
-  return MMC_read_blocks((uint8_t *)pData, ReadAddr, NumOfBlocks) == HAL_OK ? MMMC_OK : MMMC_ERROR;
+  uint8_t mmc_state = MMMC_OK;
+
+  if (HAL_MMC_ReadBlocks(&hmmc1, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) != HAL_OK)
+  {
+    mmc_state = MMMC_ERROR;
+  }
+
+  return mmc_state;
 }
 
 /* USER CODE BEGIN BeforeWriteBlocksSection */
@@ -114,7 +133,14 @@ __weak uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t N
  */
 __weak uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
-  return MMC_write_blocks((uint8_t *)pData, WriteAddr, NumOfBlocks) == HAL_OK ? MMMC_OK : MMMC_ERROR;
+  uint8_t mmc_state = MMMC_OK;
+
+  if (HAL_MMC_WriteBlocks(&hmmc1, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) != HAL_OK)
+  {
+    mmc_state = MMMC_ERROR;
+  }
+
+  return mmc_state;
 }
 
 /* USER CODE BEGIN BeforeReadDMABlocksSection */
@@ -130,6 +156,8 @@ __weak uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t
 __weak uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
 {
   uint8_t mmc_state = MMMC_OK;
+
+  BSP_MMC_DMA_direction(DMA_PERIPH_TO_MEMORY);
 
   /* Read block(s) in DMA transfer mode */
   if (HAL_MMC_ReadBlocks_DMA(&hmmc1, (uint8_t *)pData, ReadAddr, NumOfBlocks) != HAL_OK)
@@ -153,6 +181,8 @@ __weak uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32
 __weak uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
 {
   uint8_t mmc_state = MMMC_OK;
+
+  BSP_MMC_DMA_direction(DMA_MEMORY_TO_PERIPH);
 
   /* Write block(s) in DMA transfer mode */
   if (HAL_MMC_WriteBlocks_DMA(&hmmc1, (uint8_t *)pData, WriteAddr, NumOfBlocks) != HAL_OK)
@@ -214,7 +244,6 @@ __weak void BSP_MMC_GetCardInfo(BSP_MMC_CardInfo *CardInfo)
 
 /* USER CODE BEGIN BeforeCallBacksSection */
 /* can be used to modify previous code / undefine following code / add code */
-#if 0 
 /* USER CODE END BeforeCallBacksSection */
 /**
  * @brief MMC Abort callbacks
@@ -273,7 +302,6 @@ __weak void BSP_MMC_WriteCpltCallback(void)
 __weak void BSP_MMC_ReadCpltCallback(void)
 {
 }
-#endif
 /* USER CODE END CallBacksSection_C */
 #endif
 

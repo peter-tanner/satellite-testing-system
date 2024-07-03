@@ -23,7 +23,7 @@
 #include "usbd_cdc_acm_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-#include "ringbuffer.h"
+#include "cmsis_os.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,8 +32,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-extern ring_buffer_t usb_rx_ringbuffer;
-extern volatile uint8_t usb_connected;
+extern osMessageQId usbRxQueueHandle;
+extern osThreadId entrypointTaskHandle;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -263,9 +263,9 @@ static int8_t CDC_Control(uint8_t cdc_ch, uint8_t cmd, uint8_t *pbuf, uint16_t l
     // https://community.st.com/t5/stm32-mcus-embedded-software/usb-vcp-how-to-know-if-host-com-port-is-open/m-p/363004/highlight/true#M26614
     USBD_SetupReqTypedef *req = (USBD_SetupReqTypedef *)pbuf;
     if (req->wValue & 0x0001 != 0)
-      usb_connected = 1;
-    else
-      usb_connected = 0;
+      osSignalSet(entrypointTaskHandle, 0x01);
+    // else
+    //   osSignalSet(entrypointTaskHandle, 0x02);
     break;
 
   case CDC_SEND_BREAK:
@@ -298,7 +298,8 @@ static int8_t CDC_Control(uint8_t cdc_ch, uint8_t cmd, uint8_t *pbuf, uint16_t l
 static int8_t CDC_Receive(uint8_t cdc_ch, uint8_t *Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  ring_buffer_queue_arr(&usb_rx_ringbuffer, Buf, *Len);
+  osMessagePut(usbRxQueueHandle, (uint32_t)*Buf, portMAX_DELAY);
+  // ring_buffer_queue_arr(&usb_rx_ringbuffer, Buf, *Len);
   // HAL_UART_Transmit_DMA(CDC_CH_To_UART_Handle(cdc_ch), Buf, *Len);
   CDC_Transmit(cdc_ch, Buf, *Len); // echo back on same channel
 
